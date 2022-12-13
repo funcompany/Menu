@@ -35,6 +35,10 @@ public final class Menu {
         self.configuration = configuration
     }
 
+    public func getWindow() -> NSWindow? {
+        return window
+    }
+
     // MARK: - Show and dismiss
     public func show(from view: NSView, animated: Bool = true) {
         show(items, from: view, animated: animated)
