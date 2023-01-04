@@ -9,6 +9,9 @@ import Cocoa
 import EventMonitor
 
 public final class Menu {
+    public static let menuDismissed = NSNotification.Name("Menu.menuDismissed")
+    public static let menuDidShow = NSNotification.Name("Menu.menuDidShow")
+
     public private(set) var items: [MenuItem]
     public var numberOfItems: Int {
         return items.count
@@ -16,6 +19,7 @@ public final class Menu {
     public var selectedItem: MenuItem? {
         return items.first { $0.id == selectedId }
     }
+    public var id: String = ""
 
     private var window: Window?
     private var lostFocusObserver: Any?
@@ -46,6 +50,7 @@ public final class Menu {
 
     public func dismiss(animated: Bool = true) {
         let actualDismiss: (NSWindow) -> Void = { [weak self] menuWindow in
+            NotificationCenter.default.post(name: Menu.menuDismissed, object: self)
             self?.window?.parent?.removeChildWindow(menuWindow)
             self?.window?.orderOut(self)
             self?.window = nil
@@ -147,6 +152,9 @@ public final class Menu {
             fadeIn(menuWindow)
         } else {
             menuWindow.alphaValue = 1.0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { // the delay here just to fit requirements from Playback app
+            NotificationCenter.default.post(name: Menu.menuDidShow, object: self)
         }
     }
 
